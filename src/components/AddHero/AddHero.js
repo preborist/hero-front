@@ -1,27 +1,34 @@
-import { useState, useEffect } from 'react';
-import { useParams, useHistory, Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import HeroesDataServices from '../../services/heroes.service';
 
 const AddHero = () => {
-  const { register, handleSubmit, errors } = useForm();
+  const { register, handleSubmit } = useForm();
   let history = useHistory();
-  const [currentHero, setCurrentHero] = useState(null);
-  const saveHero = () => {
-    HeroesDataServices.create();
-  };
 
-  const onSubmit = data => {
-    HeroesDataServices.create(data)
+  const onSubmit = async data => {
+    const formData = new FormData();
+    formData.append('nickname', data.nickname);
+    formData.append('real_name', data.real_name);
+    formData.append('origin_description', data.origin_description);
+    formData.append('catch_phrase', data.catch_phrase);
+
+    for (const file of data.images) {
+      formData.append('images', file);
+    }
+
+    await fetch('http://localhost:3000/api/heroes', {
+      method: 'POST',
+      body: formData,
+    })
       .then(response => {
-        console.log('data hero create: ', response);
-        setCurrentHero({ ...response });
-        history.push('/');
+        return response.json();
+      })
+      .then(data => {
+        history.push('/heroes');
       })
       .catch(e => {
         console.log(e);
       });
-    console.log('data: ', data);
   };
 
   return (
@@ -29,6 +36,19 @@ const AddHero = () => {
       <div>
         <h1>Add New Hero</h1>
         <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="mb-3">
+            <label className="form-label">
+              Upload Hero Images
+              <input
+                id="images"
+                multiple
+                name="images"
+                className="form-control"
+                type="file"
+                {...register('images')}
+              />
+            </label>
+          </div>
           <div className="mb-3">
             <label className="form-label">
               Nickname

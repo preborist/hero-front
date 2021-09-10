@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Switch } from 'react-router';
+import { Route, Redirect, Switch } from 'react-router';
 import NavBar from './components/NavBar';
 import AddHero from './components/AddHero';
 import HeroesList from './components/HeroesList';
@@ -14,6 +14,7 @@ function App() {
         <Route exact path={['/', '/heroes']} component={HeroesList} />
         <Route exact path="/add" component={AddHero} />
         <Route path="/heroes/:id" component={Hero} />
+        <Redirect to="/" />
       </Switch>
     </div>
   );

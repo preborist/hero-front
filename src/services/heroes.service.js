@@ -9,8 +9,10 @@ class HeroesDataServices {
     return http.get(`/heroes/${id}`);
   }
 
-  create(data) {
-    return http.post('/heroes', data);
+  create(formData) {
+    return http.post('/heroes', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
   }
 
   update(id, data) {

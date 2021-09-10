@@ -1,19 +1,18 @@
 import { useState, useEffect } from 'react';
-import { useParams, useHistory, Link } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import HeroesDataServices from '../../services/heroes.service';
+import './Hero.scss';
 
 const Hero = () => {
   const [currentHero, setCurrentHero] = useState(null);
   let history = useHistory();
   let { id } = useParams();
-  console.log(id);
-  const { register, handleSubmit, errors } = useForm();
+  const { register, handleSubmit } = useForm();
 
   const retrieveHero = id => {
     HeroesDataServices.get(id)
       .then(response => {
-        console.log('response hero: ', response.data.data.hero);
         setCurrentHero(response.data.data.hero);
       })
       .catch(e => {
@@ -24,7 +23,6 @@ const Hero = () => {
   const deleteHero = () => {
     HeroesDataServices.delete(id)
       .then(response => {
-        console.log('response hero: ', response.data.data.hero);
         history.push('/heroes');
       })
       .catch(e => {
@@ -34,18 +32,16 @@ const Hero = () => {
 
   useEffect(() => {
     retrieveHero(id);
-  }, []);
+  }, [id]);
 
   const onSubmit = data => {
     HeroesDataServices.update(id, data)
       .then(response => {
-        console.log('data hero update: ', response);
-        setCurrentHero({ ...response });
+        setCurrentHero(response.data.data.hero);
       })
       .catch(e => {
         console.log(e);
       });
-    console.log('data: ', data);
   };
 
   return (
@@ -117,11 +113,31 @@ const Hero = () => {
                 {...register('catch_phrase')}
               />
             </div>
-            <input className="btn btn-primary" type="submit" value="Update" />
+            <input
+              className="btn btn-primary"
+              type="submit"
+              value="Update info"
+            />
           </form>
           <button className="btn btn-danger mt-2 mb-2" onClick={deleteHero}>
-            Delete
+            Delete Hero Card from Database
           </button>
+          <ul className="list-group hero-gallery flex-wrap">
+            {currentHero.images.length > 0
+              ? currentHero.images.map(image => (
+                  <li
+                    key={image.filename}
+                    className="list-group-item gallery-item"
+                  >
+                    <img
+                      src={`http://localhost:3000/${image.filename}`}
+                      className="card-img-top "
+                      alt={image.nickname}
+                    />
+                  </li>
+                ))
+              : null}
+          </ul>
         </div>
       ) : (
         <div>

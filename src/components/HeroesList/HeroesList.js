@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import _ from 'lodash';
 import ReactPaginate from 'react-paginate';
 
 import HeroesDataServices from '../../services/heroes.service';
+import defaultImage from './default.jpg';
+import './HeroesList.scss';
 
 const HeroesList = () => {
   const PAGE_SIZE = 5;
@@ -31,31 +33,40 @@ const HeroesList = () => {
 
   useEffect(() => {
     retrieveHeroesList();
-    console.log('pageCount', pageCount);
   }, []);
 
   return (
     <div>
       <h2>Heroes List</h2>
-      <ul className="list-group">
+      <ul className="list-group ">
         {displayData &&
           displayData.map(hero => (
             <li
-              className="list-group-item list-group-item-action "
+              className="list-group-item list-group-item-action"
               key={hero.id}
               onClick={() => {
                 history.push(`/heroes/${hero.id}`);
               }}
             >
               <div
-                className="card"
+                className="card "
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
                 title="Сlick to see detailed info or edit"
               >
-                <img src="..." className="card-img-top" alt="..." />
+                <img
+                  src={
+                    hero.images[0]
+                      ? `http://localhost:3000/${hero.images[0].filename}`
+                      : defaultImage
+                  }
+                  className="card-img-top img-thumbnail"
+                  alt={hero.nickname}
+                />
                 <div className="card-body">
-                  <h5 className="card-title">{hero.nickname}</h5>
+                  <h5 className="card-title">
+                    Hero Nickname: {hero.nickname.toUpperCase()}
+                  </h5>
                 </div>
               </div>
             </li>
