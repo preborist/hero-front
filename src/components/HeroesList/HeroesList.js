@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import _ from 'lodash';
 import ReactPaginate from 'react-paginate';
 
+import Loader from '../Loader';
 import HeroesDataServices from '../../services/heroes.service';
 import defaultImage from './default.jpg';
 import './HeroesList.scss';
@@ -13,12 +14,14 @@ const HeroesList = () => {
   const [heroesList, setHeroesList] = useState([]);
   const [currentPage, setPage] = useState(0);
   const [pageCount, setPageCount] = useState();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handlePageClick = ({ selected }) => {
     setPage(selected);
   };
 
   const retrieveHeroesList = () => {
+    setIsLoading(true);
     HeroesDataServices.getAll()
       .then(response => {
         setHeroesList(response.data.data);
@@ -26,7 +29,8 @@ const HeroesList = () => {
       })
       .catch(e => {
         console.log(e);
-      });
+      })
+      .finally(setIsLoading(false));
   };
 
   const displayData = _.chunk(heroesList, PAGE_SIZE)[currentPage];
@@ -37,6 +41,7 @@ const HeroesList = () => {
 
   return (
     <div>
+      {isLoading && <Loader />}
       <h2>Heroes List</h2>
       <ul className="list-group ">
         {displayData &&

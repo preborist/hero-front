@@ -1,11 +1,39 @@
+import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import toastr from 'toastr';
+
+import Loader from '../Loader';
+
+toastr.options = {
+  closeButton: false,
+  debug: false,
+  newestOnTop: false,
+  progressBar: false,
+  positionClass: 'toast-top-right',
+  preventDuplicates: false,
+  onclick: null,
+  showDuration: '300',
+  hideDuration: '1000',
+  timeOut: '5000',
+  extendedTimeOut: '1000',
+  showEasing: 'swing',
+  hideEasing: 'linear',
+  showMethod: 'fadeIn',
+  hideMethod: 'fadeOut',
+};
 
 const AddHero = () => {
-  const { register, handleSubmit } = useForm();
+  const [isLoading, setIsLoading] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   let history = useHistory();
 
   const onSubmit = async data => {
+    setIsLoading(true);
     const formData = new FormData();
     formData.append('nickname', data.nickname);
     formData.append('real_name', data.real_name);
@@ -24,17 +52,20 @@ const AddHero = () => {
         return response.json();
       })
       .then(data => {
+        toastr['success']('ulpoaded');
         history.push('/heroes');
       })
       .catch(e => {
         console.log(e);
-      });
+      })
+      .finally(setIsLoading(false));
   };
 
   return (
     <div>
       <div>
         <h1>Add New Hero</h1>
+        {isLoading && <Loader />}
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-3">
             <label className="form-label">
@@ -55,7 +86,8 @@ const AddHero = () => {
               <input
                 className="form-control"
                 type="text"
-                {...register('nickname')}
+                placeholder={errors.nickname ? 'This field is required' : ''}
+                {...register('nickname', { required: true })}
               />
             </label>
           </div>
@@ -66,7 +98,8 @@ const AddHero = () => {
               <input
                 className="form-control"
                 type="text"
-                {...register('real_name')}
+                placeholder={errors.nickname ? 'This field is required' : ''}
+                {...register('real_name', { required: true })}
               />
             </label>
           </div>

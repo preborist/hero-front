@@ -1,33 +1,59 @@
 import { useState, useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import toastr from 'toastr';
 import HeroesDataServices from '../../services/heroes.service';
 import './Hero.scss';
+import Loader from '../Loader';
+
+toastr.options = {
+  closeButton: false,
+  debug: false,
+  newestOnTop: false,
+  progressBar: false,
+  positionClass: 'toast-top-right',
+  preventDuplicates: false,
+  onclick: null,
+  showDuration: '300',
+  hideDuration: '1000',
+  timeOut: '5000',
+  extendedTimeOut: '1000',
+  showEasing: 'swing',
+  hideEasing: 'linear',
+  showMethod: 'fadeIn',
+  hideMethod: 'fadeOut',
+};
 
 const Hero = () => {
   const [currentHero, setCurrentHero] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   let history = useHistory();
   let { id } = useParams();
   const { register, handleSubmit } = useForm();
 
   const retrieveHero = id => {
+    setIsLoading(true);
     HeroesDataServices.get(id)
       .then(response => {
         setCurrentHero(response.data.data.hero);
       })
       .catch(e => {
         console.log(e);
-      });
+      })
+      .finally(setIsLoading(false));
   };
 
   const deleteHero = () => {
+    setIsLoading(true);
     HeroesDataServices.delete(id)
       .then(response => {
         history.push('/heroes');
+        toastr['success']('deleted');
       })
       .catch(e => {
         console.log(e);
-      });
+      })
+      .finally(setIsLoading(false));
   };
 
   useEffect(() => {
@@ -35,17 +61,21 @@ const Hero = () => {
   }, [id]);
 
   const onSubmit = data => {
+    setIsLoading(true);
     HeroesDataServices.update(id, data)
       .then(response => {
         setCurrentHero(response.data.data.hero);
+        toastr['success']('success');
       })
       .catch(e => {
         console.log(e);
-      });
+      })
+      .finally(setIsLoading(false));
   };
 
   return (
     <div>
+      {isLoading && <Loader />}
       {currentHero ? (
         <div>
           <h1>Update Hero spec</h1>
@@ -57,7 +87,7 @@ const Hero = () => {
                   className="form-control"
                   type="text"
                   defaultValue={currentHero.nickname}
-                  {...register('nickname')}
+                  {...register('nickname', { required: true })}
                 />
               </label>
             </div>
@@ -68,7 +98,7 @@ const Hero = () => {
                   className="form-control"
                   type="text"
                   defaultValue={currentHero.real_name}
-                  {...register('real_name')}
+                  {...register('real_name', { required: true })}
                 />
               </label>
             </div>

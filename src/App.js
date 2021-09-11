@@ -3,8 +3,9 @@ import NavBar from './components/NavBar';
 import AddHero from './components/AddHero';
 import HeroesList from './components/HeroesList';
 import Hero from './components/Hero';
-// import './App.css';
+import './App.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'toastr/toastr.scss';
 
 function App() {
   return (
